@@ -1,0 +1,27 @@
+name: Build & Test
+
+on:
+  push:
+    branches: ["master", "dev"]
+  pull_request:
+    branches: ["master", "dev"]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set up JDK 21
+      uses: actions/setup-java@v3
+      with:
+        java-version: '21'
+        distribution: 'corretto'
+        cache: maven
+    - name: Verify
+      env:
+        PRIVATE_KEY: ${{ secrets.PRIVATE_KEY }}
+        MYSQL_USER: ${{ secrets.MYSQL_USER }}
+        MYSQL_PASS: ${{ secrets.MYSQL_PASS }}
+        STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
+        GCP: ${{ secrets.GCP }}
+      run: mvn --batch-mode --update-snapshots verify
